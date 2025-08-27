@@ -2,6 +2,8 @@ import random
 import os
 import openai
 import time
+import csv
+from datetime import datetime
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -117,6 +119,21 @@ def main():
         reading = get_reading(selected_question, drawn_cards)
         print("\nYour Tarot Reading:")
         print(reading)
+
+        # Save the result to a CSV file with date and time
+        csv_file = "tarot_readings_log.csv"
+        file_exists = os.path.isfile(csv_file)
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(csv_file, mode="a", newline='', encoding="utf-8") as f:
+            writer = csv.writer(f)
+            if not file_exists:
+                writer.writerow(["datetime", "question", "cards", "reading"])
+            writer.writerow([
+                now,
+                selected_question,
+                ", ".join(drawn_cards),
+                reading
+            ])
 
         # Ask if the user wants another reading
         again = input("\nWould you like another reading? (Y/N): ").strip().lower()
