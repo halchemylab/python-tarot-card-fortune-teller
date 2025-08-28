@@ -130,18 +130,26 @@ def main():
         print("3. Exit")
         choice = input("Please enter your choice (1-3): ").strip()
 
+
         if choice == '1':
             # Randomly select 3 questions from the list of 10
             sample_questions = random.sample(questions, 3)
             print("\nPlease choose one of the following focuses:")
             for idx, q in enumerate(sample_questions, start=1):
                 print(f"{idx}. {q}")
+            print("4. Enter your own question")
             print()  # Add empty line here
-            user_choice = input("Enter the number of your choice (1-3): ").strip()
-            if user_choice not in ["1", "2", "3"]:
-                print("Invalid choice. Please select 1, 2, or 3.")
+            user_choice = input("Enter the number of your choice (1-4): ").strip()
+            if user_choice in ["1", "2", "3"]:
+                selected_question = sample_questions[int(user_choice)-1]
+            elif user_choice == "4":
+                selected_question = input("Please type your personalized question: ").strip()
+                if not selected_question:
+                    print("You must enter a question. Returning to main menu.")
+                    continue
+            else:
+                print("Invalid choice. Please select 1, 2, 3, or 4.")
                 continue
-            selected_question = sample_questions[int(user_choice)-1]
 
             # Draw 3 random tarot cards with pauses between each card
             drawn_cards = random.sample(tarot_cards, 3)
