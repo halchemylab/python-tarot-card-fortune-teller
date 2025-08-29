@@ -92,7 +92,7 @@ def get_reading(question, cards):
     return reading
 
 def view_history():
-    """Displays the tarot reading history from the log file."""
+    """Displays the tarot reading history from the log file with pagination."""
     csv_file = "tarot_readings_log.csv"
     if not os.path.isfile(csv_file):
         console.print("\n[yellow]No reading history found.[/yellow]")
@@ -116,16 +116,73 @@ def view_history():
                 Prompt.ask("\nPress Enter to return to the main menu...")
                 return
             
-            # Display readings in reverse chronological order
-            for row in reversed(readings):
-                console.print(f"\n[bold]Date:[/bold] {escape(row[0])}")
-                console.print(f"[bold]Question:[/bold] {escape(row[1])}")
-                console.print(f"[bold]Cards:[/bold] [yellow]{escape(row[2])}[/yellow]")
-                console.print(f"[bold]Reading:[/bold] {escape(row[3])}")
-                console.print("-" * 20)
+            # Pagination logic
+            page_size = 5
+            page_number = 0
+            reversed_readings = list(reversed(readings))
+            total_pages = (len(reversed_readings) + page_size - 1) // page_size
+
+            while True:
+                console.print(f"\n[bold]Page {page_number + 1} of {total_pages}[/bold]")
+                start_index = page_number * page_size
+                end_index = start_index + page_size
+                page_readings = reversed_readings[start_index:end_index]
+
+                for row in page_readings:
+                    console.print(f"\n[bold]Date:[/bold] {escape(row[0])}")
+                    console.print(f"[bold]Question:[/bold] {escape(row[1])}")
+                    console.print(f"[bold]Cards:[/bold] [yellow]{escape(row[2])}[/yellow]")
+                    console.print(f"[bold]Reading:[/bold] {escape(row[3])}")
+                    console.print("-" * 20)
+
+                if total_pages <= 1:
+                    break  # No need for navigation if only one page
+
+                # Navigation prompt
+                nav_choices = []
+                prompt_text = "[bold]Enter 'q' to quit history view"
+                if page_number > 0:
+                    nav_choices.append("p")
+                    prompt_text += ", 'p' for previous"
+                if page_number < total_pages - 1:
+                    nav_choices.append("n")
+                    prompt_text += ", 'n' for next"
+                nav_choices.append("q")
+                prompt_text += "[/bold]"
+                
+                nav_choice = Prompt.ask(prompt_text, choices=nav_choices)
+
+                if nav_choice == 'n':
+                    page_number += 1
+                elif nav_choice == 'p':
+                    page_number -= 1
+                elif nav_choice == 'q':
+                    break
 
     except Exception as e:
         console.print(f"[red]Error reading history: {escape(str(e))}[/red]")
+    
+    Prompt.ask("\nPress Enter to return to the main menu...")
+
+def clear_history():
+    """Deletes the tarot reading history log file after confirmation."""
+    csv_file = "tarot_readings_log.csv"
+    if not os.path.isfile(csv_file):
+        console.print("\n[yellow]No reading history found. Nothing to clear.[/yellow]")
+        Prompt.ask("\nPress Enter to return to the main menu...")
+        return
+
+    console.print("\n[bold red]This will permanently delete your entire reading history.[/bold red]")
+    confirm = Prompt.ask("Are you sure you want to continue?", choices=["y", "n"], default="n")
+
+    if confirm == 'y':
+        try:
+            os.remove(csv_file)
+            console.print("\n[green]Reading history has been cleared.[/green]")
+        except Exception as e:
+            console.print(f"\n[red]Error clearing history: {escape(str(e))}[/red]")
+    else:
+        console.print("\nHistory clearing cancelled.")
     
     Prompt.ask("\nPress Enter to return to the main menu...")
 
@@ -137,8 +194,9 @@ def main():
         ))
         console.print("1. Get a new tarot reading")
         console.print("2. View your reading history")
-        console.print("3. Exit")
-        choice = Prompt.ask("Please enter your choice", choices=["1", "2", "3"], default="1")
+        console.print("3. Clear your reading history")
+        console.print("4. Exit")
+        choice = Prompt.ask("Please enter your choice", choices=["1", "2", "3", "4"], default="1")
 
         if choice == '1':
             # Randomly select 3 questions from the list of 10
@@ -201,8 +259,12 @@ def main():
             view_history()
         
         elif choice == '3':
+            clear_history()
+
+        elif choice == '4':
             console.print("[bold magenta]Thank you for using the Terminal Tarot Reading App.[/bold magenta]")
             break
+
 
 if __name__ == "__main__":
     main()
