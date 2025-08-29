@@ -5,12 +5,19 @@ import time
 import csv
 from datetime import datetime
 from dotenv import load_dotenv
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Prompt
+from rich.markup import escape
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Set your OpenAI API key here or ensure it's set as the environment variable "OPENAI_API_KEY"
 openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# Initialize Rich Console
+console = Console()
 
 # List of tarot cards (using the 22 major arcana for simplicity)
 tarot_cards = [
@@ -23,7 +30,7 @@ tarot_cards = [
 # List of 10 potential focus questions
 questions = [
     "What's the general energy around me right now?",
-    "What's a good area to focus on for personal growth?",
+    "What's a good area for personal growth?",
     "What positive transformation is on its way to me?",
     "How can I embrace change in my life?",
     "What should I focus on to improve my relationships?",
@@ -88,91 +95,93 @@ def view_history():
     """Displays the tarot reading history from the log file."""
     csv_file = "tarot_readings_log.csv"
     if not os.path.isfile(csv_file):
-        print("\nNo reading history found.")
-        input("\nPress Enter to return to the main menu...")
+        console.print("\n[yellow]No reading history found.[/yellow]")
+        Prompt.ask("\nPress Enter to return to the main menu...")
         return
 
-    print("\n--- Your Reading History ---")
+    console.print(Panel.fit("[bold magenta]--- Your Reading History ---[/bold magenta]", padding=(1, 2)))
     try:
         with open(csv_file, mode="r", newline='', encoding="utf-8") as f:
             reader = csv.reader(f)
             try:
                 header = next(reader)  # Check for header
             except StopIteration:
-                print("Your history is empty.")
-                input("\nPress Enter to return to the main menu...")
+                console.print("[yellow]Your history is empty.[/yellow]")
+                Prompt.ask("\nPress Enter to return to the main menu...")
                 return
 
             readings = list(reader)
             if not readings:
-                print("Your history is empty.")
-                input("\nPress Enter to return to the main menu...")
+                console.print("[yellow]Your history is empty.[/yellow]")
+                Prompt.ask("\nPress Enter to return to the main menu...")
                 return
             
             # Display readings in reverse chronological order
             for row in reversed(readings):
-                print(f"\nDate: {row[0]}")
-                print(f"Question: {row[1]}")
-                print(f"Cards: {row[2]}")
-                print(f"Reading: {row[3]}")
-                print("-" * 20)
+                console.print(f"\n[bold]Date:[/bold] {escape(row[0])}")
+                console.print(f"[bold]Question:[/bold] {escape(row[1])}")
+                console.print(f"[bold]Cards:[/bold] [yellow]{escape(row[2])}[/yellow]")
+                console.print(f"[bold]Reading:[/bold] {escape(row[3])}")
+                console.print("-" * 20)
 
     except Exception as e:
-        print(f"Error reading history: {e}")
+        console.print(f"[red]Error reading history: {escape(str(e))}[/red]")
     
-    input("\nPress Enter to return to the main menu...")
+    Prompt.ask("\nPress Enter to return to the main menu...")
 
 def main():
     while True:
-        print("\nWelcome to the Terminal Tarot Reading App!")
-        print("1. Get a new tarot reading")
-        print("2. View your reading history")
-        print("3. Exit")
-        choice = input("Please enter your choice (1-3): ").strip()
-
+        console.print(Panel.fit(
+            "[bold magenta]Welcome to the Terminal Tarot Reading App![/bold magenta]",
+            padding=(1, 2)
+        ))
+        console.print("1. Get a new tarot reading")
+        console.print("2. View your reading history")
+        console.print("3. Exit")
+        choice = Prompt.ask("Please enter your choice", choices=["1", "2", "3"], default="1")
 
         if choice == '1':
             # Randomly select 3 questions from the list of 10
             sample_questions = random.sample(questions, 3)
-            print("\nPlease choose one of the following focuses:")
+            console.print("\n[bold]Please choose one of the following focuses:[/bold]")
             for idx, q in enumerate(sample_questions, start=1):
-                print(f"{idx}. {q}")
-            print("4. Enter your own question")
-            print()  # Add empty line here
-            user_choice = input("Enter the number of your choice (1-4): ").strip()
+                console.print(f"[cyan]{idx}[/cyan]. {escape(q)}")
+            console.print("[cyan]4[/cyan]. Enter your own question")
+            
+            user_choice = Prompt.ask("Enter the number of your choice", choices=["1", "2", "3", "4"], default="1")
+            
             if user_choice in ["1", "2", "3"]:
                 selected_question = sample_questions[int(user_choice)-1]
             elif user_choice == "4":
-                selected_question = input("Please type your personalized question: ").strip()
+                selected_question = Prompt.ask("[bold]Please type your personalized question[/bold]").strip()
                 if not selected_question:
-                    print("You must enter a question. Returning to main menu.")
+                    console.print("[red]You must enter a question. Returning to main menu.[/red]")
                     continue
-            else:
-                print("Invalid choice. Please select 1, 2, 3, or 4.")
-                continue
-
+            
             # Draw 3 random tarot cards with pauses between each card
             drawn_cards = random.sample(tarot_cards, 3)
-            print("\nDrawing 3 cards...")
-            for card in drawn_cards:
-                print(f"- {card}")
-                time.sleep(1)  # pause 1 second between each card
+            console.print("\n[bold yellow]Drawing 3 cards...[/bold yellow]")
+            with console.status("[italic green]Drawing cards...[/italic green]"):
+                for card in drawn_cards:
+                    console.print(f"- [bold]{escape(card)}[/bold]")
+                    time.sleep(1)
 
             time.sleep(2)
 
-            # Pick a progress pair randomly (without repeating until all have been used)
+            # Pick a progress pair randomly
             interpret_msg, consult_msg = get_progress_pair()
-            print(interpret_msg)
-            time.sleep(2)
-            print(consult_msg)
-            time.sleep(2)
+            with console.status(f"[italic green]{escape(interpret_msg)}[/italic green]"):
+                time.sleep(2)
+            with console.status(f"[italic green]{escape(consult_msg)}[/italic green]"):
+                time.sleep(2)
 
             # Get the tarot reading from OpenAI
-            reading = get_reading(selected_question, drawn_cards)
-            print("\nYour Tarot Reading:")
-            print(reading)
+            with console.status("[bold green]Generating your reading...[/bold green]"):
+                reading = get_reading(selected_question, drawn_cards)
+            
+            console.print(Panel(escape(reading), title="[bold blue]Your Tarot Reading[/bold blue]", border_style="blue", padding=(1, 1)))
 
-            # Save the result to a CSV file with date and time
+            # Save the result to a CSV file
             csv_file = "tarot_readings_log.csv"
             file_exists = os.path.isfile(csv_file)
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -186,17 +195,14 @@ def main():
                     ", ".join(drawn_cards),
                     reading
                 ])
-            input("\nPress Enter to return to the main menu...")
+            Prompt.ask("\nPress Enter to return to the main menu...")
 
         elif choice == '2':
             view_history()
         
         elif choice == '3':
-            print("Thank you for using the Terminal Tarot Reading App.")
+            console.print("[bold magenta]Thank you for using the Terminal Tarot Reading App.[/bold magenta]")
             break
-        
-        else:
-            print("Invalid choice. Please enter 1, 2, or 3.")
 
 if __name__ == "__main__":
     main()
