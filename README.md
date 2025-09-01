@@ -4,10 +4,14 @@ A terminal-based Tarot card fortune teller powered by OpenAI's GPT API. Draws ca
 
 ## Features
 - Draws 3 random Tarot cards from the 22 Major Arcana
-- Offers 3 random focus questions per reading
+- Offers random focus questions or lets you enter your own
 - Uses OpenAI GPT (via API key) to generate concise, supportive Tarot readings
-- Progress messages for immersive experience
-- Logs all readings to a CSV file with timestamp
+- Rich, immersive terminal experience with progress messages and styled output
+- Logs all readings to a CSV file
+- View your complete reading history with pagination
+- Search your reading history by date, question, or card
+- Display a frequency table of drawn cards with an ASCII bar chart
+- Clear your reading history
 
 ## Setup
 1. **Clone the repository**
@@ -27,23 +31,43 @@ Run the app in your terminal:
 python app.py
 ```
 
-Follow the prompts to select a focus question and receive your Tarot reading. All readings are saved to `tarot_readings_log.csv`.
+You will be presented with a main menu to guide you through the available actions:
+1.  **Get a new tarot reading:** Guides you through selecting a question and receiving a new reading.
+2.  **View your reading history:** Browse your past readings with pagination.
+3.  **Search your reading history:** Search for specific readings by date, keywords in a question, or by a card that was drawn.
+4.  **Show card frequency table:** See how many times each card has been drawn.
+5.  **Clear your reading history:** Permanently delete all your saved readings.
+6.  **Exit:** Close the application.
+
+
+All readings are saved to `tarot_readings_log.csv`.
 
 ## Requirements
 - Python 3.7+
 - openai
 - python-dotenv
+- rich
 
 ## Example Output
 ```
 Welcome to the Terminal Tarot Reading App!
 
+1. Get a new tarot reading
+2. View your reading history
+3. Search your reading history
+4. Show card frequency table
+5. Clear your reading history
+6. Exit
+Please enter your choice: 1
+
 Please choose one of the following focuses:
 1. What's the general energy around me right now?
 2. What positive transformation is on its way to me?
 3. How can I embrace change in my life?
+4. Enter your own question
 
-Enter the number of your choice (1-3): 2
+Enter the number of your choice (1-4): 4
+Please type your personalized question: What should I focus on this week?
 
 Drawing 3 cards...
 - The Fool
