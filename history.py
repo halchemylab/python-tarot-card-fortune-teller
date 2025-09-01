@@ -7,6 +7,54 @@ from rich.prompt import Prompt
 from rich.markup import escape
 
 class HistoryManager:
+    def show_card_frequency(self):
+        """Displays a table and ASCII bar chart of tarot card draw frequencies."""
+        if not os.path.isfile(self.file_path):
+            self.console.print("\n[yellow]No reading history found.[/yellow]")
+            Prompt.ask("\nPress Enter to return to the main menu...")
+            return
+
+        from collections import Counter
+
+        try:
+            with open(self.file_path, mode="r", newline='', encoding="utf-8") as f:
+                reader = csv.reader(f)
+                try:
+                    header = next(reader)
+                except StopIteration:
+                    self.console.print("[yellow]Your history is empty.[/yellow]")
+                    Prompt.ask("\nPress Enter to return to the main menu...")
+                    return
+                readings = list(reader)
+                if not readings:
+                    self.console.print("[yellow]Your history is empty.[/yellow]")
+                    Prompt.ask("\nPress Enter to return to the main menu...")
+                    return
+
+                all_cards = []
+                for row in readings:
+                    cards = [c.strip() for c in row[2].split(",") if c.strip()]
+                    all_cards.extend(cards)
+                if not all_cards:
+                    self.console.print("[yellow]No cards found in history.[/yellow]")
+                    Prompt.ask("\nPress Enter to return to the main menu...")
+                    return
+
+                freq = Counter(all_cards)
+                sorted_cards = freq.most_common()
+                max_card_len = max(len(card) for card, _ in sorted_cards)
+                max_count = max(count for _, count in sorted_cards)
+                bar_width = 30
+
+                self.console.print(Panel.fit("[bold magenta]--- Card Frequency Table ---[/bold magenta]", padding=(1, 2)))
+                self.console.print(f"{'Card'.ljust(max_card_len)} | Count | Bar")
+                self.console.print("-" * (max_card_len + 18))
+                for card, count in sorted_cards:
+                    bar = '#' * int((count / max_count) * bar_width)
+                    self.console.print(f"{card.ljust(max_card_len)} | {str(count).rjust(5)} | {bar}")
+        except Exception as e:
+            self.console.print(f"[red]Error displaying card frequency: {escape(str(e))}[/red]")
+        Prompt.ask("\nPress Enter to return to the main menu...")
     def search_history(self):
         """Allows the user to search/filter tarot reading history by date, question, or card."""
         if not os.path.isfile(self.file_path):
