@@ -104,17 +104,20 @@ class App:
             ))
             self.console.print("1. Get a new tarot reading")
             self.console.print("2. View your reading history")
-            self.console.print("3. Clear your reading history")
-            self.console.print("4. Exit")
-            choice = Prompt.ask("Please enter your choice", choices=["1", "2", "3", "4"], default="1")
+            self.console.print("3. Search your reading history")
+            self.console.print("4. Clear your reading history")
+            self.console.print("5. Exit")
+            choice = Prompt.ask("Please enter your choice", choices=["1", "2", "3", "4", "5"], default="1")
 
             if choice == '1':
                 self._perform_new_reading()
             elif choice == '2':
                 self.history_manager.view_history()
             elif choice == '3':
-                self.history_manager.clear_history()
+                self.history_manager.search_history()
             elif choice == '4':
+                self.history_manager.clear_history()
+            elif choice == '5':
                 self.console.print("[bold magenta]Thank you for using the Terminal Tarot Reading App.[/bold magenta]")
                 break
 

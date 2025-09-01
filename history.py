@@ -7,6 +7,66 @@ from rich.prompt import Prompt
 from rich.markup import escape
 
 class HistoryManager:
+    def search_history(self):
+        """Allows the user to search/filter tarot reading history by date, question, or card."""
+        if not os.path.isfile(self.file_path):
+            self.console.print("\n[yellow]No reading history found.[/yellow]")
+            Prompt.ask("\nPress Enter to return to the main menu...")
+            return
+
+        self.console.print(Panel.fit("[bold magenta]--- Search Your Reading History ---[/bold magenta]", padding=(1, 2)))
+        try:
+            with open(self.file_path, mode="r", newline='', encoding="utf-8") as f:
+                reader = csv.reader(f)
+                try:
+                    header = next(reader)
+                except StopIteration:
+                    self.console.print("[yellow]Your history is empty.[/yellow]")
+                    Prompt.ask("\nPress Enter to return to the main menu...")
+                    return
+
+                readings = list(reader)
+                if not readings:
+                    self.console.print("[yellow]Your history is empty.[/yellow]")
+                    Prompt.ask("\nPress Enter to return to the main menu...")
+                    return
+
+                # Prompt for filter type
+                filter_type = Prompt.ask(
+                    "How would you like to search?",
+                    choices=["date", "question", "card", "all", "cancel"],
+                    default="date"
+                )
+                if filter_type == "cancel":
+                    return
+
+                filtered = readings
+                if filter_type == "date":
+                    date_str = Prompt.ask("Enter date (YYYY-MM-DD) or part of date (e.g. 2025-08)").strip()
+                    filtered = [r for r in readings if date_str in r[0]]
+                elif filter_type == "question":
+                    q_str = Prompt.ask("Enter keyword or phrase from your question").strip().lower()
+                    filtered = [r for r in readings if q_str in r[1].lower()]
+                elif filter_type == "card":
+                    card_str = Prompt.ask("Enter card name or part of card name").strip().lower()
+                    filtered = [r for r in readings if card_str in r[2].lower()]
+                elif filter_type == "all":
+                    # Show all readings
+                    pass
+
+                if not filtered:
+                    self.console.print("[yellow]No readings found for your search.[/yellow]")
+                else:
+                    self.console.print(f"[green]Found {len(filtered)} matching readings:[/green]")
+                    for row in filtered:
+                        self.console.print(f"\n[bold]Date:[/bold] {escape(row[0])}")
+                        self.console.print(f"[bold]Question:[/bold] {escape(row[1])}")
+                        self.console.print(f"[bold]Cards:[/bold] [yellow]{escape(row[2])}[/yellow]")
+                        self.console.print(f"[bold]Reading:[/bold] {escape(row[3])}")
+                        self.console.print("-" * 20)
+        except Exception as e:
+            self.console.print(f"[red]Error searching history: {escape(str(e))}[/red]")
+        Prompt.ask("\nPress Enter to return to the main menu...")
     """Manages the reading history stored in a CSV file."""
     def __init__(self, file_path="tarot_readings_log.csv"):
         self.file_path = file_path
