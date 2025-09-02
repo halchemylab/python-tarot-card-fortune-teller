@@ -68,8 +68,10 @@ class App:
             selected_question = sample_questions[int(user_choice)-1]
         elif user_choice == "4":
             selected_question = Prompt.ask("[bold]Please type your personalized question[/bold]").strip()
-            if not selected_question:
-                self.console.print("[red]You must enter a question. Returning to main menu.[/red]")
+            # Add validation for the custom question
+            if not selected_question or len(selected_question) < 10 or len(selected_question.split()) < 2:
+                self.console.print("[red]Your question seems too short or may not be a valid question. Please provide a more detailed question.[/red]")
+                Prompt.ask("\nPress Enter to return to the main menu...")
                 return
 
         drawn_cards = self.deck.draw_cards(3)
