@@ -54,6 +54,26 @@ class App:
         except Exception as e:
             return f"Error generating reading: {e}"
 
+    def _perform_card_of_the_day(self):
+        """Draws and interprets a single card for the day."""
+        self.console.print("\n[bold yellow]Drawing your card of the day...[/bold yellow]")
+        drawn_card = self.deck.draw_cards(1)
+        
+        with self.console.status("[italic green]Drawing a card...[/italic green]"):
+            time.sleep(1)
+            self.console.print(f"- [bold]{escape(drawn_card[0])}[/bold]")
+            time.sleep(1)
+
+        question = "What is my card of the day?"
+        
+        with self.console.status("[bold green]Generating your reading...[/bold green]"):
+            reading = self._get_reading(question, drawn_card)
+        
+        self.console.print(Panel(escape(reading), title="[bold blue]Your Card of the Day[/bold blue]", border_style="blue", padding=(1, 1)))
+
+        self.history_manager.log_reading(question, drawn_card, reading)
+        Prompt.ask("\nPress Enter to return to the main menu...")
+
     def _perform_new_reading(self):
         """Guides the user through getting a new tarot reading."""
         sample_questions = random.sample(questions, 3)
@@ -104,25 +124,28 @@ class App:
                 "[bold magenta]Welcome to the Terminal Tarot Reading App![/bold magenta]",
                 padding=(1, 2)
             ))
-            self.console.print("1. Get a new tarot reading")
-            self.console.print("2. View your reading history")
-            self.console.print("3. Search your reading history")
-            self.console.print("4. Show card frequency table")
-            self.console.print("5. Clear your reading history")
-            self.console.print("6. Exit")
-            choice = Prompt.ask("Please enter your choice", choices=["1", "2", "3", "4", "5", "6"], default="1")
+            self.console.print("1. Get a Card of the Day")
+            self.console.print("2. Get a new tarot reading")
+            self.console.print("3. View your reading history")
+            self.console.print("4. Search your reading history")
+            self.console.print("5. Show card frequency table")
+            self.console.print("6. Clear your reading history")
+            self.console.print("7. Exit")
+            choice = Prompt.ask("Please enter your choice", choices=["1", "2", "3", "4", "5", "6", "7"], default="1")
 
             if choice == '1':
-                self._perform_new_reading()
+                self._perform_card_of_the_day()
             elif choice == '2':
-                self.history_manager.view_history()
+                self._perform_new_reading()
             elif choice == '3':
-                self.history_manager.search_history()
+                self.history_manager.view_history()
             elif choice == '4':
-                self.history_manager.show_card_frequency()
+                self.history_manager.search_history()
             elif choice == '5':
-                self.history_manager.clear_history()
+                self.history_manager.show_card_frequency()
             elif choice == '6':
+                self.history_manager.clear_history()
+            elif choice == '7':
                 self.console.print("[bold magenta]Thank you for using the Terminal Tarot Reading App.[/bold magenta]")
                 break
 
