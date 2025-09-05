@@ -1,17 +1,18 @@
 # python-tarot-card-fortune-teller
 
-A terminal-based Tarot card fortune teller powered by OpenAI's GPT API. Draws cards, asks focus questions, and provides fun, insightful readings.
+A terminal-based Tarot card fortune teller powered by OpenAI's GPT API. Draws cards, asks focus questions, and provides fun, insightful readings. This project leverages a modular architecture, with distinct components for handling the user interface, tarot deck, and reading history, all configurable via the `config.py` file.
 
 ## Features
-- Draws 3 random Tarot cards from the 22 Major Arcana
-- Offers random focus questions or lets you enter your own
-- Uses OpenAI GPT (via API key) to generate concise, supportive Tarot readings
-- Rich, immersive terminal experience with progress messages and styled output
-- Logs all readings to a CSV file
-- View your complete reading history with pagination
-- Search your reading history by date, question, or card
-- Display a frequency table of drawn cards with an ASCII bar chart
-- Clear your reading history
+- **NEW:** Get a "Card of the Day" reading for quick, daily insight.
+- Draws 3 random Tarot cards from the 22 Major Arcana for a full reading.
+- Offers a dynamic selection of random focus questions or lets you enter your own.
+- Uses OpenAI GPT (via API key) to generate concise, supportive Tarot readings.
+- Rich, immersive terminal experience with progress messages and styled output.
+- Logs all readings to a CSV file for easy access and analysis.
+- View your complete reading history with easy-to-navigate pagination.
+- Search your reading history by date, a keyword in a question, or by a specific card.
+- Display a frequency table of drawn cards with an ASCII bar chart to visualize your most-drawn cards.
+- Clear your reading history to start fresh.
 
 ## Setup
 1. **Clone the repository**
@@ -32,12 +33,13 @@ python app.py
 ```
 
 You will be presented with a main menu to guide you through the available actions:
-1.  **Get a new tarot reading:** Guides you through selecting a question and receiving a new reading.
-2.  **View your reading history:** Browse your past readings with pagination.
-3.  **Search your reading history:** Search for specific readings by date, keywords in a question, or by a card that was drawn.
-4.  **Show card frequency table:** See how many times each card has been drawn.
-5.  **Clear your reading history:** Permanently delete all your saved readings.
-6.  **Exit:** Close the application.
+1.  **Get a Card of the Day:** Draws a single card for daily guidance.
+2.  **Get a new tarot reading:** Guides you through selecting a question and receiving a new 3-card reading.
+3.  **View your reading history:** Browse your past readings with pagination.
+4.  **Search your reading history:** Search for specific readings by date, keywords in a question, or by a card that was drawn.
+5.  **Show card frequency table:** See how many times each card has been drawn.
+6.  **Clear your reading history:** Permanently delete all your saved readings.
+7.  **Exit:** Close the application.
 
 
 All readings are saved to `tarot_readings_log.csv`.
@@ -52,33 +54,24 @@ All readings are saved to `tarot_readings_log.csv`.
 ```
 Welcome to the Terminal Tarot Reading App!
 
-1. Get a new tarot reading
-2. View your reading history
-3. Search your reading history
-4. Show card frequency table
-5. Clear your reading history
-6. Exit
+1. Get a Card of the Day
+2. Get a new tarot reading
+3. View your reading history
+4. Search your reading history
+5. Show card frequency table
+6. Clear your reading history
+7. Exit
 Please enter your choice: 1
 
-Please choose one of the following focuses:
-1. What's the general energy around me right now?
-2. What positive transformation is on its way to me?
-3. How can I embrace change in my life?
-4. Enter your own question
+Drawing your card of the day...
+- The Empress
 
-Enter the number of your choice (1-4): 4
-Please type your personalized question: What should I focus on this week?
+Generating your reading...
 
-Drawing 3 cards...
-- The Fool
-- The Tower
-- The Sun
+Your Card of the Day:
+Today, The Empress encourages you to connect with your creativity and abundance. Nurture your ideas and relationships, and enjoy the beauty that surrounds you.
 
-Interpreting the cards...
-Consulting the spirits...
-
-Your Tarot Reading:
-You are entering a period of transformation. The Fool and The Tower suggest a sudden change, but The Sun promises a positive outcome. Embrace new beginnings with optimism.
+Press Enter to return to the main menu...
 ```
 
 ## License
