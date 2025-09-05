@@ -8,3 +8,19 @@
 # Ignore Python cache and compiled files
 __pycache__/
 *.py[cod]
+
+# Ignore VS Code settings and workspace files
+.vscode/
+.vscode/settings.json
+
+# Ignore common Python environment and package files
+.env
+.env.example
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+*.log
+*.sqlite3
+*.db
